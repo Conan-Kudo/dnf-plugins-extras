@@ -257,6 +257,47 @@ Obsoletes:      dnf-plugins-extras-snapper <= 0.0.4-2
 %description -n python3-dnf-plugins-extras-snapper
 Snapper Plugin for DNF, Python 3 version. Creates snapshot every transaction.
 
+%package -n python2-%{name}-system-upgrade
+Summary:        System Upgrade Plugin for DNF
+Requires:       python-%{name}-common = %{?epoch:%{?epoch}:}%{version}-%{release}
+Requires:       python2-systemd
+%{?python_provide:%python_provide python2-%{name}-system-upgrade}
+
+Obsoletes:	fedup < 0.9.4
+Obsoletes:	dnf-plugin-system-upgrade < 0.10
+Obsoletes:	python2-dnf-plugin-system-upgrade < 0.10
+
+BuildRequires:  pkgconfig(systemd)
+BuildRequires:  systemd
+BuildRequires:  python2-systemd
+%{?system_requires}
+
+%description -n python2-%{name}-system-upgrade
+System Upgrade Plugin for DNF, Python 2 version. Enables offline system upgrades
+using the "dnf system-upgrade" command.
+
+%package -n python3-%{name}-system-upgrade
+Summary:        System Upgrade Plugin for DNF
+Requires:       python3-%{name}-common = %{?epoch:%{?epoch}:}%{version}-%{release}
+Requires:       python3-systemd
+%{?python_provide:%python_provide python3-%{name}-system-upgrade}
+Provides:       dnf-command(system-upgrade)
+Provides:       %{name}-system-upgrade = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       system-upgrade = %{?epoch:%{epoch}:}%{version}-%{release}
+
+Obsoletes:	fedup < 0.9.4
+Obsoletes:	dnf-plugin-system-upgrade < 0.10
+Obsoletes:	python3-dnf-plugin-system-upgrade < 0.10
+
+BuildRequires:  pkgconfig(systemd)
+BuildRequires:  systemd
+BuildRequires:  python3-systemd
+%{?systemd_requires}
+
+%description -n python3-%{name}-system-upgrade
+System Upgrade Plugin for DNF, Python 3 version. Enables offline system upgrades
+using the "dnf system-upgrade" command.
+
 %package -n python-dnf-plugins-extras-tracer
 Summary:        Tracer Plugin for DNF
 Requires:       python-dnf-plugins-extras-common = %{version}-%{release}
@@ -334,6 +375,11 @@ pushd python2
 popd
 pushd python3
   %make_install
+popd
+
+mkdir -p %{buildroot}%{_unitdir}/system-update.target.wants/
+pushd %{buildroot}%{_unitdir}/system-update.target.wants/
+  ln -sr ../dnf-system-upgrade.service
 popd
 
 %find_lang %{name}
@@ -431,6 +477,17 @@ PYTHONPATH="%{buildroot}%{python3_sitelib}:%{buildroot}%{python3_sitelib}/dnf-pl
 %files -n python3-dnf-plugins-extras-snapper
 %{python3_sitelib}/dnf-plugins/snapper.*
 %{python3_sitelib}/dnf-plugins/__pycache__/snapper.*
+
+%files -n python2-%{name}-system-upgrade
+%{_unitdir}/dnf-system-upgrade.service
+%{_unitdir}/system-update.target.wants/dnf-system-upgrade.service
+%{python2_sitelib}/dnf-plugins/system_upgrade.*
+
+%files -n python3-%{name}-system-upgrade
+%{_unitdir}/dnf-system-upgrade.service
+%{_unitdir}/system-update.target.wants/dnf-system-upgrade.service
+%{python3_sitelib}/dnf-plugins/system_upgrade.py
+%{python3_sitelib}/dnf-plugins/__pycache__/system_upgrade.*
 
 %files -n python-dnf-plugins-extras-tracer
 %{python2_sitelib}/dnf-plugins/tracer.*
